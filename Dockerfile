@@ -1,4 +1,4 @@
-from alpine as build-environment
+from --platform=$BUILDPLATFORM  alpine as build-environment
 WORKDIR /opt
 RUN apk add clang lld curl build-base linux-headers \
     && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh \
@@ -6,7 +6,7 @@ RUN apk add clang lld curl build-base linux-headers \
     && ./rustup.sh -y
 WORKDIR /opt/foundry
 COPY . .
-RUN source $HOME/.profile && cargo build --release \
+RUN source $HOME/.profile && cargo build --release --target $TARGETARCH \
     && strip /opt/foundry/target/release/forge \
     && strip /opt/foundry/target/release/cast
 
