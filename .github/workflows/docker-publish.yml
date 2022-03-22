@@ -41,9 +41,6 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-        with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          platforms: arm64,amd64
 
       - name: Set up Docker Buildx
         id: buildx
@@ -84,6 +81,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          platforms: amd64, arm64
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
