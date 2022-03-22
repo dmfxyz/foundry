@@ -6,7 +6,7 @@ RUN apk add clang lld curl build-base linux-headers \
     && ./rustup.sh -y
 WORKDIR /opt/foundry
 COPY . .
-RUN source $HOME/.profile && cargo build --release --target $TARGETARCH \
+RUN source $HOME/.profile && cargo build --release --target $TARGETPLATFORM \
     && strip /opt/foundry/target/release/forge \
     && strip /opt/foundry/target/release/cast
 
