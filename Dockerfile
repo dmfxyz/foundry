@@ -1,4 +1,6 @@
-from --platform=$BUILDPLATFORM  alpine as build-environment
+from alpine as build-environment
+ARG BUILDPLATFORM
+ARG TARGETARCH
 WORKDIR /opt
 RUN apk add clang lld curl build-base linux-headers \
     && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh \
@@ -6,11 +8,11 @@ RUN apk add clang lld curl build-base linux-headers \
     && ./rustup.sh -y
 WORKDIR /opt/foundry
 COPY . .
-RUN source $HOME/.profile && cargo build --release --target $TARGETPLATFORM \
+RUN source $HOME/.profile && cargo build --release --target $TARGETARCH \
     && strip /opt/foundry/target/release/forge \
     && strip /opt/foundry/target/release/cast
 
-from alpine as foundry-client
+from --platform=$TARGETPLATFORM alpine as foundry-client
 ENV GLIBC_KEY=https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
 ENV GLIBC_KEY_FILE=/etc/apk/keys/sgerrand.rsa.pub
 ENV GLIBC_RELEASE=https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk
