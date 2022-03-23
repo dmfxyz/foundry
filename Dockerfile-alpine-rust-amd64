@@ -1,0 +1,10 @@
+from amd64/alpine as build-environment
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+WORKDIR /opt
+RUN apk add clang lld curl build-base linux-headers \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh \
+    && chmod +x ./rustup.sh \
+    && ./rustup.sh -y
+COPY . .
+ENTRYPOINT ["/bin/sh -c"]
