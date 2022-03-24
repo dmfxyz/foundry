@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "evm-adapters",
     "utils",
     "cast",
     "forge",
@@ -8,20 +7,26 @@ members = [
     "cli/test-utils",
     "config",
     "fmt",
+    "ui",
+    "evm"
 ]
 
-# Binary size optimizations
+[profile.test]
+# Speeds up build
+debug = 0
+# Speeds up tests
+opt-level = 3
+
 [profile.release]
-opt-level = "z"
-lto = true
+# Optimize for binary size, but keep loop vectorization
+opt-level = "s"
+strip = true
+# Performance optimizations
+lto = "fat"
 codegen-units = 1
 panic = "abort"
-debug = true
-
-## Patch sputnik with more recent primitive types
-# https://github.com/rust-blockchain/evm/pulls
-[patch."https://github.com/rust-blockchain/evm"]
-evm = { git = "https://github.com/gakonst/evm", branch = "bump-primitive-types" }
+# We end up stripping away these symbols anyway
+debug = 0
 
 ## Patch ethers-rs with a local checkout then run `cargo update -p ethers`
 #[patch."https://github.com/gakonst/ethers-rs"]
