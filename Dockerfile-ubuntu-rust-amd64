@@ -1,0 +1,10 @@
+from amd64/ubuntu as build-environment
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+WORKDIR /opt
+RUN apt update && apt install -y build-essential curl \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh \
+    && chmod +x ./rustup.sh \
+    && ./rustup.sh -y
+COPY . .
+ENTRYPOINT ["/bin/sh -c"]
