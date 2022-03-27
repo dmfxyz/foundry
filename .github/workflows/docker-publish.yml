@@ -40,15 +40,20 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       # Creates an additional 'latest' or 'nightly' tag
+      # If the job is triggered via cron schedule, tag nightly and nightly-{SHA}
+      # If the job is triggered via workflow dispatch and on a master branch, tag latest
+      # Otherwise, just tag as the branch name
       - name: Assign Additional Docker Metadata
         id: additional_tags
         run: |
-          if [[ "${{ steps.meta.outputs.tags }}" == *"foundry:main" ]] || [[ "${{ steps.meta.outputs.tags }}" == *"foundry:master" ]]; then
-            echo "assigning latest tag"
+          if [[ "${{ github.event_name }}" == 'schedule' ]]; then
+            echo "cron trigger, assigning nightly tag"
+            echo "::set-output name=additonal_tag::${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly-${GITHUB_SHA}"
+          elif [[ "${{ steps.meta.outputs.tags }}" == *"foundry:main" ]] || [[ "${{ steps.meta.outputs.tags }}" == *"foundry:master" ]]; then
+            echo "manual trigger from master/main branch, assigning latest tag"
             echo "::set-output name=additional_tag::${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
           else
-            echo "assigning nightly tag"
-            echo "::set-output name=additonal_tag::${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly-${GITHUB_SHA}"
+            echo "Neither scheduled nor manual release from main branch. No additional tags."
           fi
 
       # Log docker metadata to explicitly know what is being pushed
