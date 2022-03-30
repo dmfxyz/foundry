@@ -124,7 +124,7 @@ pub async fn watch_snapshot(args: SnapshotArgs) -> eyre::Result<()> {
 /// Executes a [`Watchexec`] that listens for changes in the project's src dir and reruns `forge
 /// test`
 pub async fn watch_test(args: TestArgs) -> eyre::Result<()> {
-    let (init, mut runtime) = args.build_args().watchexec_config()?;
+    let (init, mut runtime) = args.watchexec_config()?;
     let cmd = cmd_args(
         args.build_args().watch.watch.as_ref().map(|paths| paths.len()).unwrap_or_default(),
     );

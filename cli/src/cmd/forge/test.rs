@@ -1,7 +1,7 @@
 //! Test command
 use crate::{
     cmd::{
-        forge::{build::BuildArgs, run::RunArgs},
+        forge::{build::BuildArgs, run::RunArgs, watch::WatchArgs},
         Cmd,
     },
     opts::evm::EvmArgs,
@@ -19,6 +19,7 @@ use forge::{
 use foundry_config::{figment::Figment, Config};
 use regex::Regex;
 use std::{collections::BTreeMap, path::PathBuf, str::FromStr, sync::mpsc::channel, thread};
+use watchexec::config::{InitConfig, RuntimeConfig};
 
 #[derive(Debug, Clone, Parser)]
 pub struct Filter {
@@ -141,12 +142,20 @@ pub struct TestArgs {
 
     #[clap(flatten, next_help_heading = "BUILD OPTIONS")]
     opts: BuildArgs,
+
+    #[clap(flatten)]
+    pub watch: WatchArgs,
 }
 
 impl TestArgs {
     /// Returns the flattened [`BuildArgs`]
     pub fn build_args(&self) -> &BuildArgs {
         &self.opts
+    }
+
+    pub(crate) fn watchexec_config(&self) -> eyre::Result<(InitConfig, RuntimeConfig)> {
+        // use the path arguments or if none where provided the `src` dir
+        self.watch.watchexec_config(|| Config::from(self).src)
     }
 
     /// Returns the flattened [`Filter`] arguments
